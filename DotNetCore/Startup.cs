@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using System;
 
 namespace DotNetCore
 {
@@ -25,13 +26,26 @@ namespace DotNetCore
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             UseException(app, env);
+            UseAuthentication(app);
             UseMVC(app);
-
             //Other Middlewares.
             app.UseHsts(); //HTTP Strict Transport Security
 
 
             UseAnonimouseMethod(app);
+        }
+
+        private static void UseAuthentication(IApplicationBuilder app)
+        {
+            //app.UseAuthentication();
+            //app.UseMiddleware<AuthenticationMiddleware>();
+            app.UseWhen(x => (x.Request.Path.StartsWithSegments("/api/Authentication", StringComparison.OrdinalIgnoreCase)),
+            builder =>
+            {
+                builder.UseMiddleware<AuthenticationMiddleware>();
+            });
+            //app.Map("/api/Authentication", AuthenticationMiddleware); todo
+
         }
 
         private static void UseAnonimouseMethod(IApplicationBuilder app)

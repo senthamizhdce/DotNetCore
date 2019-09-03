@@ -12,9 +12,29 @@ namespace DotNetCore
 {
     public class Program
     {
+        enum AppType
+        {
+            ConsoleApplication = 0, //Run using application
+            WebAPI = 0 //Run Using IISExpress
+        }
+        static AppType appType = AppType.WebAPI;
+
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            if (appType == AppType.WebAPI)
+            {
+                //which runs the web application and it begins listening for incoming HTTP requests.
+                CreateWebHostBuilder(args).Build().Run();
+            }
+            else
+            {
+                DotNetCore.OOPS.Dynamic.DynamicMethod();
+
+                Console.Read();
+
+                Console.Write("Welcome to Console application");
+                Console.ReadKey();
+            }
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>

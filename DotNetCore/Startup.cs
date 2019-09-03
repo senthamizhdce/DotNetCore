@@ -14,13 +14,10 @@ namespace DotNetCore
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddMvcCore();//Basic future
-            services.AddMvc()
-                    .AddJsonOptions(options =>
-                    {
-                        options.SerializerSettings.Formatting = Formatting.Indented;                        
-                    });
+            AddMVC(services);
+            AddSession(services);
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -31,8 +28,29 @@ namespace DotNetCore
             //Other Middlewares.
             app.UseHsts(); //HTTP Strict Transport Security
 
-
             UseAnonimouseMethod(app);
+        }
+
+        private static void AddSession(IServiceCollection services)
+        {
+            services.AddSession(options =>
+            {
+                // Set a short timeout for easy testing.
+                options.IdleTimeout = TimeSpan.FromSeconds(1000);
+                options.Cookie.HttpOnly = true;
+                // Make the session cookie essential
+                options.Cookie.IsEssential = true;
+            });
+        }
+
+        private static void AddMVC(IServiceCollection services)
+        {
+            //services.AddMvcCore();//Basic future
+            services.AddMvc()
+                    .AddJsonOptions(options =>
+                    {
+                        options.SerializerSettings.Formatting = Formatting.Indented;
+                    });
         }
 
         private static void UseAuthentication(IApplicationBuilder app)

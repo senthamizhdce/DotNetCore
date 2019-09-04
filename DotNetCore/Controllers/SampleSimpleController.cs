@@ -7,10 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DotNetCore.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class EFController : ControllerBase
+    public class SampleSimpleController
     {
-        
+        public string Index()
+        {
+            return "Simple controller. Without inheriting controller class";
+        }
     }
 }

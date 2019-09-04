@@ -1,7 +1,10 @@
-﻿using DotNetCore.Middleware;
+﻿using Core.EF;
+using DotNetCore.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
@@ -10,10 +13,27 @@ namespace DotNetCore
 {
     public class Startup
     {
+        private IConfiguration _config;
+
+        // ctor double tab will create constructor
+        // Notice we are using Dependency Injection here
+        public Startup(IConfiguration configuration)
+        {
+            _config = configuration;
+        }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            //an instance from the DbContext pool is provided if available, rather than creating a new instance.
+            services.AddDbContextPool<AppDbContext>(
+            options => options.UseSqlServer(_config.GetConnectionString("EmployeeDBConnection")));
+           
+            //services.AddSingleton<IEmp, MockEmpRep>();
+            //services.AddTransient<IEmployeeRepository, MockEmployeeRepository>();
+            services.AddTransient<IEmployeeRepository, SQLEmployeeRepository>();
+
             AddMVC(services);
             AddSession(services);
         }
@@ -25,10 +45,17 @@ namespace DotNetCore
             UseException(app, env);
             UseAuthentication(app);
             UseMVC(app);
-            //Other Middlewares.
-            app.UseHsts(); //HTTP Strict Transport Security
+
+            OtherMiddlewares(app);
 
             UseAnonimouseMethod(app);
+        }
+
+        private static void OtherMiddlewares(IApplicationBuilder app)
+        {
+            //Other Middlewares.
+            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            app.UseHsts(); //HTTP Strict Transport Security
         }
 
         private static void AddSession(IServiceCollection services)

@@ -1,15 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace DotNetCore.OOPS
 {
     public class Dynamic
     {
+        static string data;
+
+        public static void SetObject(object value)
+        {
+            data = JsonConvert.SerializeObject(value);
+        }
+
+        public static T GetObject<T>(string data)
+        {
+            //var value = session.GetString(key);
+            return  JsonConvert.DeserializeObject<T>(data);
+        }
+
         // Main Method 
         static public void DynamicMethod()
         {
+            SetObject(new { Date = DateTime.Now });
+            dynamic b = GetObject<dynamic>(data);
+
             Interface1 obj = new Class1();
             obj.Method();
 

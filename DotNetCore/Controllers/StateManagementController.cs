@@ -1,35 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace DotNetCore.Controllers
 {
+    //https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-2.2
+
     [Route("api/[controller]")]
     [ApiController]
     public class StateManagementController : ControllerBase
     {
         [HttpGet]
         [Route("GetSession")]
-        public IEnumerable<string> GetSession()
+        public IActionResult GetSession()
         {
-
-            string Value1;
 
             ISession a = Request.HttpContext.Session;
 
-            if (a.GetString("Value1") == null)
+            if (a.GetString("JSON") == null)//10 Idle seconds time out
             {
-                a.SetString("Value1", "One");
+                SetObject(a, "JSON", new { Name = "Selvan" });
+                SetObject(a, "Date", DateTime.Now);
+                a.SetInt32("Int32", DateTime.Now.Second);
+                a.SetString("Name", "Selvan");
             }
+            dynamic JSON = GetObject<dynamic>(a, "JSON");
+            DateTime Date = GetObject<DateTime>(a, "Date");
+            string Name = a.GetString("Name");
+            Int32? Second = a.GetInt32("Int32");
+            
 
-            Value1 = a.GetString("Value1").ToString();
+            return Ok(new { Date = Date.ToString(), Name = Name, JSON = JSON, Second = Second ,SessionID = HttpContext.Session.Id });
+        }
 
-            return new string[] { Value1 };
+        [NonAction]
+        public static void SetObject(ISession session, string key, object value)
+        {
+            session.SetString(key, JsonConvert.SerializeObject(value));
+        }
+        [NonAction]
+        public static T GetObject<T>(ISession session, string key)
+        {
+            var value = session.GetString(key);
+            return value == null ? default(T) : JsonConvert.DeserializeObject<T>(value);
         }
 
         [HttpGet("{id}")]

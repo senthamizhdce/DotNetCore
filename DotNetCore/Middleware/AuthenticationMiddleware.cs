@@ -19,6 +19,8 @@ namespace DotNetCore.Middleware
 
         public async Task Invoke(HttpContext context)
         {
+             
+
             string authHeader = context.Request.Headers["Authorization"];
             if (authHeader != null && authHeader.StartsWith("Basic"))
             {

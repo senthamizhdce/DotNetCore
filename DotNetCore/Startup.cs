@@ -26,18 +26,11 @@ namespace DotNetCore
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            //an instance from the DbContext pool is provided if available, rather than creating a new instance.
-            services.AddDbContextPool<AppDbContext>(
-            options => options.UseSqlServer(_config.GetConnectionString("EmployeeDBConnection")));
-
-            //services.AddSingleton<IEmp, MockEmpRep>();
-            //services.AddTransient<IEmployeeRepository, MockEmployeeRepository>();
-            services.AddTransient<IEmployeeRepository, SQLEmployeeRepository>();
-
-            AddMVC(services);
+            AddEF(services);
             AddSession(services);
+            AddMVC(services);
+            
         }
-
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -45,11 +38,23 @@ namespace DotNetCore
             UseException(app, env);
             app.UseStaticFiles();//Short circute when found file
             UseAuthentication(app);
+            app.UseSession(); //Enable user session
             UseMVC(app);//Short circute when found route
 
             OtherMiddlewares(app);
 
             UseAnonimouseMethod(app, env);
+        }
+
+        private void AddEF(IServiceCollection services)
+        {
+            //an instance from the DbContext pool is provided if available, rather than creating a new instance.
+            services.AddDbContextPool<AppDbContext>(
+            options => options.UseSqlServer(_config.GetConnectionString("EmployeeDBConnection")));
+
+            //services.AddSingleton<IEmp, MockEmpRep>();
+            //services.AddTransient<IEmployeeRepository, MockEmployeeRepository>();
+            services.AddTransient<IEmployeeRepository, SQLEmployeeRepository>();
         }
 
         private static void OtherMiddlewares(IApplicationBuilder app)
@@ -63,8 +68,12 @@ namespace DotNetCore
         {
             services.AddSession(options =>
             {
+                // Store the session ID in the request property bag.
+                //request.Properties[SessionIdToken] = sessionId;
+
+                //options.Cookie.Name = "SessionID";
                 // Set a short timeout for easy testing.
-                options.IdleTimeout = TimeSpan.FromSeconds(1000);
+                options.IdleTimeout = TimeSpan.FromSeconds(10);//10 Idle seconds time out 
                 options.Cookie.HttpOnly = true;
                 // Make the session cookie essential
                 options.Cookie.IsEssential = true;

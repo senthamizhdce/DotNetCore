@@ -14,14 +14,16 @@
       //1.	When you run project it will start on "launchUrl". "launchUrl" is set to "api/values" in the project template. Nothing to do with MVC route that you changed
       "launchUrl": "API/Authentication/ThrowException",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "MyKey": "IISExpress. Value of MyKey from launchSettings.json"
       }
     },
     "DotNetCore": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "MyKey": "DotNetCore Project. Value of MyKey from launchSettings.json"
       },
       "applicationUrl": "http://localhost:5000"
     }

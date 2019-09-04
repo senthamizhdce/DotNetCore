@@ -29,7 +29,7 @@ namespace DotNetCore
             //an instance from the DbContext pool is provided if available, rather than creating a new instance.
             services.AddDbContextPool<AppDbContext>(
             options => options.UseSqlServer(_config.GetConnectionString("EmployeeDBConnection")));
-           
+
             //services.AddSingleton<IEmp, MockEmpRep>();
             //services.AddTransient<IEmployeeRepository, MockEmployeeRepository>();
             services.AddTransient<IEmployeeRepository, SQLEmployeeRepository>();
@@ -43,12 +43,13 @@ namespace DotNetCore
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             UseException(app, env);
+            app.UseStaticFiles();//Short circute when found file
             UseAuthentication(app);
-            UseMVC(app);
+            UseMVC(app);//Short circute when found route
 
             OtherMiddlewares(app);
 
-            UseAnonimouseMethod(app);
+            UseAnonimouseMethod(app, env);
         }
 
         private static void OtherMiddlewares(IApplicationBuilder app)
@@ -93,7 +94,7 @@ namespace DotNetCore
 
         }
 
-        private static void UseAnonimouseMethod(IApplicationBuilder app)
+        private static void UseAnonimouseMethod(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.Use(async (context, next) =>
             {
@@ -101,9 +102,32 @@ namespace DotNetCore
                 await next.Invoke();
                 await context.Response.WriteAsync("After Use;\n\n");
             });
+
+            //app.Run is a terminal midleware
             app.Run(async (context) =>
             {
-                await context.Response.WriteAsync("Invalid Route;\n\n");
+
+                if (env.IsDevelopment() & 1 == 2)
+                {
+                    await context.Response.WriteAsync("Hello World!");
+                    //The internal web server is Kestrel.
+                    //External web server can be IIS, Nginx or Apache.
+                    //Kestrel is a cross-platform web server for ASP.NET Core.
+                    //In Kestrel, the process used to host the app is dotnet.exe.
+                    //Command line C:\Selvan\Sty\Core\Core>dotnet run
+
+                    //CommandName       AspNetCoreHostingModel  Internal Web Server External Web Server
+                    //Project           Hosting Setting Ignored Only one web server is used - Kestrel
+                    //IISExpress        InProcess               Only one web server is used - IIS Express
+                    //IISExpress        OutOfProcess            Kestrel             IIS Express
+                    //IIS               InProcess               Only one web server is used - IIS
+                    //IIS               OutOfProcess            Kestrel             IIS
+                    string ProcessName = System.Diagnostics.Process.GetCurrentProcess().ProcessName;
+                    await context.Response.WriteAsync("\r\n" + "ProcessName : " + ProcessName);
+                }
+                //await context.Response.WriteAsync(_configuration["MyKey"]);
+                await context.Response.WriteAsync(Environment.GetEnvironmentVariable("MyKey"));
+
             });
         }
 

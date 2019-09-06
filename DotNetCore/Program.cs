@@ -1,44 +1,65 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using System;
+
+using NLog.Web;
 using Microsoft.Extensions.Logging;
 
 namespace DotNetCore
 {
     public class Program
     {
-        enum AppType
+        enum EnumAppType
         {
             ConsoleApplication = 0, //Run using application
-            WebAPI = 0 //Run Using IISExpress
+            WebAPI = 1 //Run Using IISExpress
         }
-        static AppType appType = AppType.WebAPI;
+        static EnumAppType AppType = EnumAppType.WebAPI;
 
         public static void Main(string[] args)
         {
-            if (appType == AppType.WebAPI)
+            // NLog: setup the logger first to catch all errors
+            var logger = NLog.Web.NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
+            try
             {
-                //which runs the web application and it begins listening for incoming HTTP requests.
-                CreateWebHostBuilder(args).Build().Run();
+                logger.Debug("Init Main");
+
+                if (AppType == EnumAppType.WebAPI)
+                {
+                    //which runs the web application and it begins listening for incoming HTTP requests.
+                    CreateWebHostBuilder(args).Build().Run();
+                }
+                else
+                {
+                    DotNetCore.OOPS.Dynamic.DynamicMethod();
+
+                    Console.Read();
+
+                    Console.Write("Welcome to Console application");
+                    Console.ReadKey();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                DotNetCore.OOPS.Dynamic.DynamicMethod();
-
-                Console.Read();
-
-                Console.Write("Welcome to Console application");
-                Console.ReadKey();
+                //NLog: catch setup errors
+                logger.Error(ex, "Stopped program because of exception");
+                throw;
+            }
+            finally
+            {
+                // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
+                NLog.LogManager.Shutdown();
             }
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+                })
+                .UseNLog();  // NLog: setup NLog for Dependency injection
     }
 }

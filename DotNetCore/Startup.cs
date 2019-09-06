@@ -28,7 +28,24 @@ namespace DotNetCore
         {
             AddEF(services);
             AddSession(services);
-            AddMVC(services);            
+            AddMVC(services);
+            AddHTTPClient(services);
+        }
+
+        private static void AddHTTPClient(IServiceCollection services)
+        {
+            //Basic Usage
+            //services.AddHttpClient();
+            
+            //Named Clients
+            services.AddHttpClient("github", c =>
+            {
+                c.BaseAddress = new Uri("https://api.github.com/");
+                // Github API versioning
+                c.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
+                // Github requires a user-agent
+                c.DefaultRequestHeaders.Add("User-Agent", "HttpClientFactory-Sample");
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

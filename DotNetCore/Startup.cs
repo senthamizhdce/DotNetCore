@@ -1,5 +1,8 @@
 ﻿using Core.EF;
 using DotNetCore.Middleware;
+using HttpClientFactorySample.GitHub;
+using HttpClientFactorySample.Handlers;
+using HttpClientFactorySample.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -7,7 +10,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Polly;
 using System;
+using System.Net.Http;
 
 namespace DotNetCore
 {
@@ -15,8 +20,6 @@ namespace DotNetCore
     {
         private IConfiguration _config;
 
-        // ctor double tab will create constructor
-        // Notice we are using Dependency Injection here
         public Startup(IConfiguration configuration)
         {
             _config = configuration;
@@ -32,22 +35,6 @@ namespace DotNetCore
             AddHTTPClient(services);
         }
 
-        private static void AddHTTPClient(IServiceCollection services)
-        {
-            //Basic Usage
-            //services.AddHttpClient();
-            
-            //Named Clients
-            services.AddHttpClient("github", c =>
-            {
-                c.BaseAddress = new Uri("https://api.github.com/");
-                // Github API versioning
-                c.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
-                // Github requires a user-agent
-                c.DefaultRequestHeaders.Add("User-Agent", "HttpClientFactory-Sample");
-            });
-        }
-
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
@@ -60,6 +47,117 @@ namespace DotNetCore
             OtherMiddlewares(app);
 
             UseAnonimouseMethod(app, env);
+        }
+
+        private static void AddHTTPClient(IServiceCollection services)
+        {
+            // basic usage
+            #region snippet1
+            services.AddHttpClient();
+            #endregion
+
+            // named client
+            #region snippet2
+            services.AddHttpClient("github", c =>
+            {
+                c.BaseAddress = new Uri("https://api.github.com/");
+                    // Github API versioning
+                    c.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
+                    // Github requires a user-agent
+                    c.DefaultRequestHeaders.Add("User-Agent", "HttpClientFactory-Sample");
+            });
+            #endregion
+
+            // typed client where configuration occurs in ctor
+            #region snippet3
+            services.AddHttpClient<GitHubService>();
+            #endregion
+
+            // typed client where configuration occurs during registration
+            #region snippet4
+            services.AddHttpClient<RepoService>(c =>
+            {
+                c.BaseAddress = new Uri("https://api.github.com/");
+                c.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
+                c.DefaultRequestHeaders.Add("User-Agent", "HttpClientFactory-Sample");
+            });
+            #endregion
+
+            #region snippet5
+            services.AddTransient<ValidateHeaderHandler>();
+
+            services.AddHttpClient("externalservice", c =>
+            {
+                    // Assume this is an "external" service which requires an API KEY
+                    c.BaseAddress = new Uri("https://localhost:5000/");
+            })
+            .AddHttpMessageHandler<ValidateHeaderHandler>();
+            #endregion
+
+            #region snippet6
+            services.AddTransient<SecureRequestHandler>();
+            services.AddTransient<RequestDataHandler>();
+
+            services.AddHttpClient("clientwithhandlers")
+                // This handler is on the outside and called first during the 
+                // request, last during the response.
+                .AddHttpMessageHandler<SecureRequestHandler>()
+                // This handler is on the inside, closest to the request being 
+                // sent.
+                .AddHttpMessageHandler<RequestDataHandler>();
+            #endregion
+
+            #region snippet7
+            services.AddHttpClient<UnreliableEndpointCallerService>()
+                .AddTransientHttpErrorPolicy(p =>
+                    p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(600)));
+            #endregion
+
+            #region snippet8
+            var timeout = Policy.TimeoutAsync<HttpResponseMessage>(
+                TimeSpan.FromSeconds(10));
+            var longTimeout = Policy.TimeoutAsync<HttpResponseMessage>(
+                TimeSpan.FromSeconds(30));
+
+            services.AddHttpClient("conditionalpolicy")
+                // Run some code to select a policy based on the request
+                .AddPolicyHandler(request =>
+                    request.Method == HttpMethod.Get ? timeout : longTimeout);
+            #endregion
+
+            #region snippet9
+            services.AddHttpClient("multiplepolicies")
+                .AddTransientHttpErrorPolicy(p => p.RetryAsync(3))
+                .AddTransientHttpErrorPolicy(
+                    p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+            #endregion
+
+            #region snippet10
+            var registry = services.AddPolicyRegistry();
+
+            registry.Add("regular", timeout);
+            registry.Add("long", longTimeout);
+
+            services.AddHttpClient("regulartimeouthandler")
+                .AddPolicyHandlerFromRegistry("regular");
+            #endregion
+
+            #region snippet11
+            services.AddHttpClient("extendedhandlerlifetime")
+                .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+            #endregion
+
+            #region snippet12
+            services.AddHttpClient("configured-inner-handler")
+                .ConfigurePrimaryHttpMessageHandler(() =>
+                {
+                    return new HttpClientHandler()
+                    {
+                        AllowAutoRedirect = false,
+                        UseDefaultCredentials = true
+                    };
+                });
+            #endregion
         }
 
         private void AddEF(IServiceCollection services)
@@ -175,6 +273,7 @@ namespace DotNetCore
         private static void UseException(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.UseMiddleware<ErrorHandlingMiddleware>();
+
             if (env.IsDevelopment())
             {
                 //app.UseDatabaseErrorPage();
@@ -183,6 +282,7 @@ namespace DotNetCore
             else
             {
                 //app.UseExceptionHandler();
+                //app.UseExceptionHandler("/Error");
             }
 
             //app.UseExceptionHandler(a => a.Run(async context =>

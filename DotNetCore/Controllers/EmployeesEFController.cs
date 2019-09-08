@@ -41,7 +41,7 @@ namespace Core.Controllers
 
             return View(employee);
         }
-        [Route("/")]
+        [Route("Create")]
         // GET: EmployeesEF/Create
         public IActionResult Create()
         {

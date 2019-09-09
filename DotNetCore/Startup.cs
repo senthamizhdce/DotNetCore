@@ -1,5 +1,6 @@
 ﻿using Core.EF;
 using DotNetCore.Middleware;
+using DotNetCore.Others.SignalR;
 using HttpClientFactorySample.GitHub;
 using HttpClientFactorySample.Handlers;
 using HttpClientFactorySample.Services;
@@ -29,6 +30,14 @@ namespace DotNetCore
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+            services.AddSignalR();
+
             AddEF(services);
             AddSession(services);
             AddMVC(services);
@@ -38,15 +47,24 @@ namespace DotNetCore
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            
+
             UseException(app, env);
             app.UseStaticFiles();//Short circute when found file
+
+            app.UseCookiePolicy();
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<ChatHub>("/chatHub");
+            });
+            
             UseAuthentication(app);
             app.UseSession(); //Enable user session
             UseMVC(app);//Short circute when found route
 
-            OtherMiddlewares(app);
+            //OtherMiddlewares(app);
 
-            UseAnonimouseMethod(app, env);
+            //UseAnonimouseMethod(app, env);
         }
 
         private static void AddHTTPClient(IServiceCollection services)

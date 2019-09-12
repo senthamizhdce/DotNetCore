@@ -12,7 +12,7 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       //1.	When you run project it will start on "launchUrl". "launchUrl" is set to "api/values" in the project template. Nothing to do with MVC route that you changed
-      "launchUrl": "AJAX.html",
+      "launchUrl": "api/StateManagement/ResponseCache",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "MyKey": "IISExpress. Value of MyKey from launchSettings.json"

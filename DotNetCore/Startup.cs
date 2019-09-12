@@ -1,5 +1,6 @@
 ﻿using Core.EF;
 using DotNetCore.Middleware;
+using DotNetCore.Others.Models;
 using DotNetCore.Others.SignalR;
 using HttpClientFactorySample.GitHub;
 using HttpClientFactorySample.Handlers;
@@ -40,6 +41,15 @@ namespace DotNetCore
 
             AddEF(services);
             AddSession(services);
+            services.AddSingleton<DIAppData>();
+            services.AddTransient<DIByObjectRequest>();
+            services.AddScoped<DIByHTTPRequest>();
+            
+            // cache in memory
+            services.AddMemoryCache();
+            // caching response for middlewares
+            services.AddResponseCaching();
+
             AddMVC(services);
             AddHTTPClient(services);
         }
@@ -51,6 +61,9 @@ namespace DotNetCore
 
             UseException(app, env);
             app.UseStaticFiles();//Short circute when found file
+             
+            // caching response for middlewares
+            app.UseResponseCaching();
 
             app.UseCookiePolicy();
             app.UseSignalR(routes =>
@@ -58,6 +71,7 @@ namespace DotNetCore
                 routes.MapHub<ChatHub>("/chatHub");
             });
             
+
             UseAuthentication(app);
             app.UseSession(); //Enable user session
             UseMVC(app);//Short circute when found route

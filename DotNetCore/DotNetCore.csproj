@@ -29,4 +29,9 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="CSharp\DesignPatterns\Behavioural\" />
+    <Folder Include="CSharp\DesignPatterns\Structural\" />
+  </ItemGroup>
+
 </Project>

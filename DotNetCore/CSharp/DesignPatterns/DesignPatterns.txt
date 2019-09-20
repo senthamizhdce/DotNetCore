@@ -1,0 +1,78 @@
+﻿https://www.dofactory.com/net/design-patterns
+Creational Patterns
+  Abstract Factory	Creates an instance of several families of classes
+  Builder	Separates object construction from its representation
+  Factory Method	Creates an instance of several derived classes
+  Prototype	A fully initialized instance to be copied or cloned
+  Singleton	A class of which only a single instance can exist
+
+Structural Patterns
+  Adapter	Match interfaces of different classes
+  Bridge	Separates an object’s interface from its implementation
+  Composite	A tree structure of simple and composite objects
+  Decorator	Add responsibilities to objects dynamically
+  Facade	A single class that represents an entire subsystem
+  Flyweight	A fine-grained instance used for efficient sharing
+  Proxy	An object representing another object
+
+Behavioral Patterns
+  Chain of Resp.	A way of passing a request between a chain of objects
+  Command	Encapsulate a command request as an object
+  Interpreter	A way to include language elements in a program
+  Iterator	Sequentially access the elements of a collection
+  Mediator	Defines simplified communication between classes
+  Memento	Capture and restore an object's internal state
+  Observer	A way of notifying change to a number of classes
+  State	Alter an object's behavior when its state changes
+  Strategy	Encapsulates an algorithm inside a class
+  Template Method	Defer the exact steps of an algorithm to a subclass
+  Visitor	Defines a new operation to a class without change
+
+https://www.c-sharpcorner.com/UploadFile/8911c4/singleton-design-pattern-in-C-Sharp/
+Single ton
+==========
+The advantages of a Singleton Pattern are:
+Singleton pattern can be implemented interfaces.
+It can be also inherit from other classes.
+It can be lazy loaded.
+It has Static Initialization.
+It can be extended into a factory pattern.
+It helps to hide dependencies.
+It provides a single point of access to a particular instance, so it is easy to maintain.
+Disadvantages of Singleton Pattern
+ 
+The disadvantages of a Singleton Pattern are:
+Unit testing is more difficult (because it introduces a global state into an application).
+This pattern reduces the potential for parallelism within a program, because to access the singleton in a multi-threaded system, an object must be serialized (by locking).
+Singleton class vs. Static methods
+ 
+The following conpares Singleton class vs. Static methods:
+A Static Class cannot be extended whereas a singleton class can be extended.
+A Static Class can still have instances (unwanted instances) whereas a singleton class prevents it.
+A Static Class cannot be initialized with a STATE (parameter), whereas a singleton class can be.
+A Static class is loaded automatically by the CLR when the program or namespace containing the class is loaded.
+How to Implement Singleton Pattern in your code
+ 
+There are many way to implement a Singleton Pattern in C#.
+No Thread Safe Singleton.
+Thread-Safety Singleton.
+Thread-Safety Singleton using Double-Check Locking.
+Thread-Safe Singleton without using locks and no lazy instantiation.
+Fully lazy instantiation.
+Using .NET 4's Lazy<T> type.
+
+Abstract Factory
+================
+https://www.dofactory.com/net/abstract-factory-design-pattern
+AbstractFactory  (ContinentFactory)
+declares an interface for operations that create abstract products
+ConcreteFactory   (AfricaFactory, AmericaFactory)
+implements the operations to create concrete product objects
+AbstractProduct   (Herbivore, Carnivore)
+declares an interface for a type of product object
+Product  (Wildebeest, Lion, Bison, Wolf)
+defines a product object to be created by the corresponding concrete factory
+implements the AbstractProduct interface
+Client  (AnimalWorld)
+uses interfaces declared by AbstractFactory and AbstractProduct classes
+

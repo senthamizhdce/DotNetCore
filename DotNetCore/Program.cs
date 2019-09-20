@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using System;
-
-using NLog.Web;
 using Microsoft.Extensions.Logging;
+using NLog.Web;
+using System;
 
 namespace DotNetCore
 {
@@ -14,7 +13,7 @@ namespace DotNetCore
             ConsoleApplication = 0, //Run using application
             WebAPI = 1 //Run Using IISExpress
         }
-        static EnumAppType AppType = EnumAppType.WebAPI;
+        static EnumAppType AppType = EnumAppType.ConsoleApplication;
 
         public static void Main(string[] args)
         {
@@ -31,11 +30,8 @@ namespace DotNetCore
                 }
                 else
                 {
-                    DotNetCore.OOPS.Dynamic.DynamicMethod();
-
-                    Console.Read();
-
                     Console.Write("Welcome to Console application");
+                    RunConsole(); 
                     Console.ReadKey();
                 }
             }
@@ -61,5 +57,10 @@ namespace DotNetCore
                     logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
                 })
                 .UseNLog();  // NLog: setup NLog for Dependency injection
+
+        public static void RunConsole()
+        {
+            //DotNetCore.OOPS.Dynamic.DynamicMethod();
+        }
     }
 }

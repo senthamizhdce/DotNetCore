@@ -1,0 +1,13 @@
+[
+  {
+    "outputFileName": "wwwroot/lib/JS/Bundle and Minify.js",
+    "inputFiles": [
+      "wwwroot/lib/JS/AJAX.js",
+      "wwwroot/lib/JS/Chat.js",
+      "wwwroot/lib/signalr/dist/browser/signalr.js"
+    ],
+    "minify": {
+      "enabled": true
+    }
+  } 
+]

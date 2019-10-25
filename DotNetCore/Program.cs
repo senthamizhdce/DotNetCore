@@ -13,7 +13,7 @@ namespace DotNetCore
             ConsoleApplication = 0, //Run using application
             WebAPI = 1 //Run Using IISExpress
         }
-        static EnumAppType AppType = EnumAppType.ConsoleApplication;
+        static EnumAppType AppType = EnumAppType.WebAPI;
 
         public static void Main(string[] args)
         {

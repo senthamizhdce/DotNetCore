@@ -3,7 +3,8 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:50475",
+      //"applicationUrl": "http://localhost:50475",
+      "applicationUrl": "http://localhost:5001",
       "sslPort": 0
     }
   },
@@ -12,7 +13,7 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       //1.	When you run project it will start on "launchUrl". "launchUrl" is set to "api/values" in the project template. Nothing to do with MVC route that you changed
-      "launchUrl": "api/StateManagement/ResponseCache",
+      "launchUrl": "api/JWTAuth",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "MyKey": "IISExpress. Value of MyKey from launchSettings.json"
@@ -21,6 +22,7 @@
     "DotNetCore": {
       "commandName": "Project",
       "launchBrowser": true,
+      "launchUrl": "api/JWTAuth",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "MyKey": "DotNetCore Project. Value of MyKey from launchSettings.json"

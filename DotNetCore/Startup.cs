@@ -11,10 +11,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+
 using Newtonsoft.Json;
 using Polly;
 using System;
 using System.Net.Http;
+using System.Text;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DotNetCore
 {
@@ -50,6 +56,23 @@ namespace DotNetCore
             // caching response for middlewares
             services.AddResponseCaching();
 
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+           .AddJwtBearer(options =>
+           {
+               options.TokenValidationParameters = new TokenValidationParameters
+               {
+                   //ValidateIssuer = true,
+                   //ValidateAudience = true,
+                   //ValidateLifetime = true,
+                   //ValidateIssuerSigningKey = true,
+
+                   //ValidIssuer = "http://localhost:5000",
+                   //ValidAudience = "http://localhost:5000",
+                   
+                   IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("KeyForSignInSecret@1234"))
+               };
+           });
+
             AddMVC(services);
             AddHTTPClient(services);
         }
@@ -60,20 +83,23 @@ namespace DotNetCore
             
 
             UseException(app, env);
-            app.UseStaticFiles();//Short circute when found file
+            //app.UseStaticFiles();//Short circute when found file
              
-            // caching response for middlewares
-            app.UseResponseCaching();
+            //// caching response for middlewares
+            //app.UseResponseCaching();
 
-            app.UseCookiePolicy();
-            app.UseSignalR(routes =>
-            {
-                routes.MapHub<ChatHub>("/chatHub");
-            });
-            
+            //app.UseCookiePolicy();
+            //app.UseSignalR(routes =>
+            //{
+            //    routes.MapHub<ChatHub>("/chatHub");
+            //});
+
+            //app.UseAuthentication();
 
             UseAuthentication(app);
+
             app.UseSession(); //Enable user session
+
             UseMVC(app);//Short circute when found route
 
             //OtherMiddlewares(app);
@@ -229,11 +255,15 @@ namespace DotNetCore
         private static void AddMVC(IServiceCollection services)
         {
             //services.AddMvcCore();//Basic future
-            services.AddMvc()
-                    .AddJsonOptions(options =>
-                    {
-                        options.SerializerSettings.Formatting = Formatting.Indented;
-                    });
+            //Commented for JWT
+            //services.AddMvc()
+            //        .AddJsonOptions(options =>
+            //        {
+            //            options.SerializerSettings.Formatting = Formatting.Indented;
+            //        });
+
+            //Added for JWT
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         private static void UseAuthentication(IApplicationBuilder app)
@@ -299,7 +329,8 @@ namespace DotNetCore
             //    template: "api/{controller}/{action}",
             //    defaults: new { controller = "Exception", action = "ThrowException" });
             //});
-            app.UseMvc();
+
+           app.UseMvc();            
         }
 
         private static void UseException(IApplicationBuilder app, IHostingEnvironment env)

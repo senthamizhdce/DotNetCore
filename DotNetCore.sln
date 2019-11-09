@@ -5,6 +5,27 @@ VisualStudioVersion = 15.0.28307.757
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetCore", "DotNetCore\DotNetCore.csproj", "{2B611D94-0379-4A0E-B3C1-F3AED20E259F}"
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "ASPDotNet(2)", "ASPDotNet\", "{62747426-BC4F-4A74-ACC9-831AEF6EF801}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.6"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_52074"
+		Debug.AspNetCompiler.PhysicalPath = "ASPDotNet\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_52074\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_52074"
+		Release.AspNetCompiler.PhysicalPath = "ASPDotNet\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_52074\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "52074"
+		DefaultWebSiteLanguage = "Visual C#"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +36,10 @@ Global
 		{2B611D94-0379-4A0E-B3C1-F3AED20E259F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B611D94-0379-4A0E-B3C1-F3AED20E259F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B611D94-0379-4A0E-B3C1-F3AED20E259F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62747426-BC4F-4A74-ACC9-831AEF6EF801}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62747426-BC4F-4A74-ACC9-831AEF6EF801}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62747426-BC4F-4A74-ACC9-831AEF6EF801}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{62747426-BC4F-4A74-ACC9-831AEF6EF801}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
